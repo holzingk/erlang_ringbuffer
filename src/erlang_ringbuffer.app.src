@@ -1,0 +1,15 @@
+{application, erlang_ringbuffer,
+ [{description, "Provides a simple fixed size queue using the Erlang queue Module"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
