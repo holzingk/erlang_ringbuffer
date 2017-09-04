@@ -1,7 +1,7 @@
 -module(erlang_ringbuffer).
 
 %% API exports
--export([new/1, add/2, getFirst/1, getAll/1]).
+-export([new/1, add/2, getFirst/1, getAll/1, flush/1]).
 
 %%====================================================================
 %% API functions
@@ -20,7 +20,6 @@ new(Size) ->
 	#ringbuffer{max = Size, cur = 0, q = queue:new()}.
 
 add(Item, Buf) ->
-	%We have to fallback to tuples to circumvent 'illegal pattern'
 	case Buf of
 		% Maximum reached?
 		{ringbuffer, Max, Max, _} -> 
@@ -38,7 +37,15 @@ getFirst(Buf) ->
 getAll(Buf) ->
 	queue:to_list(Buf#ringbuffer.q).
 
+flush(Buf) ->
+	Ret = getAll(Buf),
+	NewBuf = remove_all(Buf),
+	{ok, Ret, NewBuf}.
 
-%%====================================================================
-%% Internal functions
-%%====================================================================
+remove_all(Buf) ->
+	remove(Buf, Buf#ringbuffer.cur).
+
+remove(Buf, 0) -> Buf;
+remove(Buf, N) ->
+	{_, New} = queue:out(Buf#ringbuffer.q),
+	remove(Buf#ringbuffer{cur = Buf#ringbuffer.cur - 1, q = New}, N-1).
